@@ -1,0 +1,13 @@
+{
+  "name": "jolly-roger-tests",
+  "description": "Test for jolly-roger",
+  "version": "0.0.1",
+  "dependencies": {
+    "nightwatch": "0.8.6",
+    "phantomjs": "^1.9.10",
+    "selenium-standalone": "4.2.2"
+  },
+  "scripts": {
+    "test": "./run-tests.sh"
+  }
+}
