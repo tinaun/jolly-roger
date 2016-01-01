@@ -2,6 +2,53 @@ const BS = ReactBootstrap;
 
 PureRenderMixin = React.addons.PureRenderMixin;
 
+ActivityTracker = React.createClass({
+  propTypes: {
+    hunt: React.PropTypes.string.isRequired,
+    puzzle: React.PropTypes.string.isRequired,
+    user: React.PropTypes.string.isRequired,
+  },
+
+  updateActivityState(state) {
+    const now = new Date();
+
+    const activity = {
+      hunt: this.props.hunt,
+      puzzle: this.props.puzzle,
+      user: this.props.user,
+      state: state,
+    };
+
+    // If the current state doesn't match the old activity object,
+    // create a new one
+    if (!_.isEqual(this.currentActivity, activity)) {
+      if (this.currentActivity) {
+        Models.Activity.update(this.currentActivityId, {$set: {end: now}});
+      }
+
+      this.currentActivity = activity;
+      this.currentActivityId = Models.Activity.insert(_.extend({
+        start: now,
+        end: now,
+      }, activity));
+    } else {
+      Models.Activity.update(this.currentActivityId, {$set: {end: now}});
+    }
+  },
+
+  componentDidMount() {
+    //this.updateActivityState('active');
+  },
+
+  componentWillUnmount() {
+  },
+
+  // This component has no visual piece
+  render() {
+    return false;
+  },
+});
+
 RelatedPuzzleSection = React.createClass({
   mixins: [PureRenderMixin],
   propTypes: {
@@ -672,6 +719,7 @@ PuzzlePage = React.createClass({
       profiles,
       allGuesses,
       allDocuments,
+      userId: Meteor.userId(),
     };
   },
 
@@ -688,6 +736,7 @@ PuzzlePage = React.createClass({
     return (
       <DocumentTitle title={`${activePuzzle.title} :: Jolly Roger`}>
         <div style={{display: 'flex', flexDirection: 'row', position: 'absolute', top: '0', bottom: '0', left:'0', right:'0'}}>
+          <ActivityTracker hunt={this.props.params.huntId} puzzle={this.props.params.puzzleId} user={this.data.userId}/>
           <PuzzlePageSidebar activePuzzle={activePuzzle}
                              allPuzzles={this.data.allPuzzles}
                              allTags={this.data.allTags}
