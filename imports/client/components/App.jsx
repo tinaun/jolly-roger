@@ -8,6 +8,51 @@ import { JRPropTypes } from '/imports/client/JRPropTypes.js';
 import { ConnectionStatus } from '/imports/client/components/ConnectionStatus.jsx';
 import { NotificationCenter } from '/imports/client/components/NotificationCenter.jsx';
 
+const LoadingSpinner = React.createClass({
+  contextTypes: {
+    subs: JRPropTypes.subs,
+  },
+
+  mixins: [ReactMeteorData],
+
+  getMeteorData() {
+    return { ready: this.context.subs.ready() };
+  },
+
+  render() {
+    if (this.data.ready) {
+      return <div />;
+    }
+
+    const style = {
+      position: 'fixed',
+      top: '0px',
+      left: '0px',
+      right: '0px',
+      bottom: '0px',
+      zIndex: '10000', // navbar is z index 1030
+      backgroundColor: '#fff',
+      opacity: 0.5,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'column',
+    };
+    return (
+      <div style={style}>
+        <h1>loading...</h1>
+        <p>
+          <img
+            style={{ width: '100px', height: '100px' }}
+            src="/images/spinner.gif"
+            role="presentation"
+          />
+        </p>
+      </div>
+    );
+  },
+});
+
 const SharedNavbar = React.createClass({
   contextTypes: {
     subs: JRPropTypes.subs,
@@ -83,6 +128,7 @@ const FullscreenLayout = React.createClass({
     return (
       <div>
         <NotificationCenter />
+        <LoadingSpinner />
         <SharedNavbar {...props} />
         <div style={{ position: 'fixed', top: '50px', left: '0px', right: '0px', zIndex: '1' }}>
           <ConnectionStatus />
@@ -105,6 +151,7 @@ const ScrollableLayout = React.createClass({
     return (
       <div>
         <NotificationCenter />
+        <LoadingSpinner />
         <SharedNavbar {...props} />
         <div className="container" style={{ paddingTop: '70px' }}>
           <ConnectionStatus />
